@@ -11,4 +11,5 @@ fn main() {
     let seperator = view_controller::utils::seperator(63, true);
     println!("{}", header);
     println!("{}", seperator);
+    view_controller::main::run_basic(true);
 }

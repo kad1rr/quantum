@@ -8,13 +8,14 @@ pub mod theme_controller {
   }
 
   pub fn get(path: &str, key: &str, message: &str) -> String {
-      if let Ok(theme) = new(path) {
-          if let Some(color_value) = theme[key].as_str() {
-              let color_code = format!("\x1b[{}", color_value);
-              return format!("{}{}{}", color_code, message, "\x1b[0m");
-          }
-      }
-
+    if fs::metadata(path).is_ok() {
+        if let Ok(theme) = new(path) {
+            if let Some(color_value) = theme[key].as_str() {
+                let color_code = format!("\x1b[{}", color_value);
+                return format!("{}{}{}", color_code, message, "\x1b[0m");
+            }
+        }
+    }
       message.to_string()
   }
 }
