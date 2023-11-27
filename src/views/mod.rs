@@ -26,24 +26,33 @@ pub mod view_controller {
     }
 
     pub mod main {
-        use crate::theme::theme_controller;
+        use crate::{theme::theme_controller, cpu};
         use std::str;
-        use sysinfo::SystemExt;
+        use sysinfo::{SystemExt, System};
 
         pub fn run_basic(use_colors: bool) -> bool {
-
             let mut system = sysinfo::System::new_all();
 
             system.refresh_all();
+
+            let mut cpu = cpu::cpu::get_cpu_vendor().unwrap();
+
+            if cpu == "amd" {
+                cpu = "Amd Ryzen".to_string()
+            } else if cpu == "intel" {
+                cpu = "Intel".to_string()
+            }
+
+            let memory_message = get_memory_usage(&system);
 
             if use_colors {
                 print("Os", &system.name().unwrap());
                 print("Host", &system.host_name().unwrap());
                 print("Kernel", &system.kernel_version().unwrap());
                 print("Uptime", &get_uptime());
-                // TODO: Add CPU support for stats.
-                // TODO: Add more stats
-                print("Cpu", &"Amd Test");
+                print("CPU", &cpu);
+                print("Theme", &theme_controller::new("./quantum.theme.json").unwrap()["name"].to_string());
+                print("Memory", &memory_message);
             }
             return true;
         }
@@ -57,6 +66,16 @@ pub mod view_controller {
             return true
         }
 
+        fn get_memory_usage(system: &System) -> String {
+            let total_memory_gb = system.total_memory() as f64 / (1024.0 * 1024.0 * 1024.0);
+            let used_memory_gb = (total_memory_gb - system.free_memory() as f64 / (1024.0 * 1024.0 * 1024.0)).round();
+        
+            let total_memory_gb_rounded = total_memory_gb.round();
+            let used_memory_gb_rounded = used_memory_gb.round();
+        
+            format!("{:.0}GB/{:.0}GB", used_memory_gb_rounded, total_memory_gb_rounded)
+        }
+
         fn get_uptime() -> String {
             let mut system = sysinfo::System::new_all();
 
@@ -65,10 +84,10 @@ pub mod view_controller {
             let uptime_seconds = system.uptime();
 
             let hours = uptime_seconds / 3600;
-    let minutes = (uptime_seconds % 3600) / 60;
-    let seconds = uptime_seconds % 60;
+            let minutes = (uptime_seconds % 3600) / 60;
+            let seconds = uptime_seconds % 60;
 
-    return format!("{} hours {} minutes {} seconds", hours, minutes, seconds).to_string()
+            return format!("{} hours {} minutes {} seconds", hours, minutes, seconds).to_string()
         }
     }
 
@@ -85,7 +104,7 @@ pub mod view_controller {
 
             if use_color {
                 return theme_controller::get("./quantum.theme.json", "primary", &message);
-            } else {
+        } else {
                 return message;
 
             }
