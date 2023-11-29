@@ -3,7 +3,6 @@ fn clear_console() {
     std::process::Command::new("cmd").arg("/c").arg("cls").status().unwrap();
 }
 
-
 #[cfg(unix)]
 fn clear_console() {
     std::process::Command::new("clear").status().unwrap();
@@ -12,6 +11,12 @@ fn clear_console() {
 #[cfg(not(any(windows, unix)))]
 fn clear_console() {
     // TODO: Add support for other platforms
+    println!("Unsupported platform");
+}
+
+#[cfg(target_os = "macos")]
+fn clear_console() {
+    std::process::Command::new("clear").status().unwrap();
 }
 
 pub mod views;

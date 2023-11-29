@@ -58,12 +58,15 @@ pub mod view_controller {
         }
 
         fn print(key: &str, value: &str) -> bool {
-
-            let message = format!("{}: {}", theme_controller::get("./quantum.theme.json", "primary", &("- ".to_owned() + key)), theme_controller::get("./quantum.theme.json", "secondary", value));
+            let message = format!(
+                "{}: {}",
+                theme_controller::get("./quantum.theme.json", "primary", &("- ".to_owned() + key)),
+                theme_controller::get("./quantum.theme.json", "secondary", value)
+            );
 
             println!("{}", message);
 
-            return true
+            return true;
         }
 
         fn get_memory_usage(system: &System) -> String {
@@ -94,6 +97,21 @@ pub mod view_controller {
     pub mod utils {
         use crate::theme_controller;
 
+        #[cfg(windows)]
+        pub fn clear_console() {
+            std::process::Command::new("cmd").arg("/c").arg("cls").status().unwrap();
+        }
+
+        #[cfg(unix)]
+        pub fn clear_console() {
+            std::process::Command::new("clear").status().unwrap();
+        }
+
+        #[cfg(not(any(windows, unix)))]
+        pub fn clear_console() {
+            // TODO: Add support for other platforms
+        }
+
         pub fn seperator(mut l: u128, use_color: bool) -> String {
             let mut message = "".to_string();
 
@@ -104,11 +122,9 @@ pub mod view_controller {
 
             if use_color {
                 return theme_controller::get("./quantum.theme.json", "primary", &message);
-        } else {
+            } else {
                 return message;
-
             }
         }
     }
-    
 }
