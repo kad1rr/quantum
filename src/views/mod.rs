@@ -1,6 +1,5 @@
 pub mod view_controller {
     pub mod header {
-        use std::fs;
         use crate::theme::theme_controller;
 
         pub fn new(name: &str, use_colors: bool) -> String {
@@ -8,20 +7,51 @@ pub mod view_controller {
         }
     
         pub fn get(name: &str, use_color: bool) -> String {
-            let file_path = format!("./src/views/assets/{}.txt", name);
-            let is_file_exists = fs::metadata(file_path.clone()).is_ok();
-            if is_file_exists {
-                if let Ok(content) = fs::read_to_string(file_path.clone()) {
+            const AMD: &str = r#"
+                                                 @@@@@@@@@@@@@@
+    @@@@@@      @@@@@     @@@@   @@@@@@@@@@@       @@@@@@@@@@@@
+    @@@@@@@     @@@@@@  @@@@@@   @@@     @@@@              @@@@
+   @@@  @@@@    @@@@@@@@@@@@@@   @@@      @@@@    @@       @@@@
+  @@@@   @@@    @@@@  @@@  @@@   @@@      @@@@   @@@       @@@@
+ @@@@@@@@@@@@   @@@@       @@@   @@@     @@@@   @@@@       @@@@
+ @@@       @@@  @@@@       @@@   @@@@@@@@@@@    @@@@@@@@@   @@@
+                                                @@@@@@@       @
+
+"#;
+
+            const INTEL: &str = r#"
+
+            ####                ----                  :@@@
+            ####                %@@@                  :@@@
+                                %@@@                  :@@@
+            @@@+ :@@@ @@@@@@-   %@@@@@    -@@@@@@%    :@@@
+            @@@+ :@@@@@%%@@@@@  %@@@@@  +@@@@%%@@@@@  :@@@
+            @@@+ :@@@      @@@- %@@@   -@@@      @@@# :@@@
+            @@@+ :@@@      @@@= %@@@   @@@@@@@@@@@@@@ :@@@
+            @@@+ :@@@      @@@= %@@@   -@@@           :@@@
+            @@@+ :@@@      @@@=  @@@@@  #@@@@@%@@@@+  :@@@
+            @@@+ :@@@      @@@=   @@@@    +@@@@@@@    :@@@
+            
+            "#;
+
+            
+            match name {
+                "amd" => {
                     if use_color {
-                        let header = theme_controller::get("./quantum.theme.json", "primary", &content);
-                        return header;
+                        return theme_controller::get("./quantum.theme.json", "primary", AMD);
                     } else {
-                        let header = content;
-                        return header;
+                        return AMD.to_string()
+                    }
+                },
+                "intel" => {
+                    if use_color {
+                        return  theme_controller::get("./quantum.theme.json", "primary", INTEL);
+                    } else {
+                        return INTEL.to_string()
                     }
                 }
+                _ => return "error".to_string()
             }
-            return "error".to_string();
         }
     }
 

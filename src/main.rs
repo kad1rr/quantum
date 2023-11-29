@@ -1,3 +1,5 @@
+use std::io::{self, Write};
+
 #[cfg(windows)]
 fn clear_console() {
     std::process::Command::new("cmd").arg("/c").arg("cls").status().unwrap();
@@ -34,4 +36,17 @@ fn main() {
     println!("{}", header);
     println!("{}", separator);
     view_controller::main::run_basic(true);
+
+    loop {
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("err main.rs:45 read_line failed with expect");
+
+        let input = input.trim();
+
+        if input.to_lowercase() == "exit" {
+            break;
+        }
+    }
 }
