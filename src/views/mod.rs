@@ -68,7 +68,7 @@ pub mod view_controller {
             let mut cpu = cpu::cpu::get_cpu_vendor().unwrap();
 
             if cpu == "amd" {
-                cpu = "Amd Ryzen".to_string()
+                cpu = "Amd".to_string()
             } else if cpu == "intel" {
                 cpu = "Intel".to_string()
             }
@@ -76,27 +76,97 @@ pub mod view_controller {
             let memory_message = get_memory_usage(&system);
 
             if use_colors {
-                print("Os", &system.name().unwrap());
-                print("Host", &system.host_name().unwrap());
-                print("Kernel", &system.kernel_version().unwrap());
-                print("Uptime", &get_uptime());
-                print("CPU", &cpu);
-                print("Theme", &theme_controller::new("./quantum.theme.json").unwrap()["name"].to_string());
-                print("Memory", &memory_message);
+                print("Os", &system.name().unwrap(), true);
+                print("Os Version", &system.long_os_version().unwrap(), true);
+                print("Host", &system.host_name().unwrap(), true);
+                print("Kernel", &system.kernel_version().unwrap(), true);
+                print("Uptime", &get_uptime(), true);
+                print("CPU", &cpu, true);
+                print("CPU Core Count", &system.physical_core_count().unwrap().to_string(), true);
+                print("Theme", &theme_controller::new("./quantum.theme.json").unwrap()["name"].to_string(), true);
+                print("Memory", &memory_message, true);
+            } else {
+                print("Os", &system.name().unwrap(), false);
+                print("Os Version", &system.long_os_version().unwrap(), false);
+                print("Host", &system.host_name().unwrap(), false);
+                print("Kernel", &system.kernel_version().unwrap(), false);
+                print("Uptime", &get_uptime(), false);
+                print("CPU", &cpu, false);
+                print("CPU Core Count", &system.physical_core_count().unwrap().to_string(), false);
+                print("Theme", &theme_controller::new("./quantum.theme.json").unwrap()["name"].to_string(), false);
+                print("Memory", &memory_message, false);
             }
             return true;
         }
 
-        fn print(key: &str, value: &str) -> bool {
-            let message = format!(
-                "{}: {}",
-                theme_controller::get("./quantum.theme.json", "primary", &("- ".to_owned() + key)),
-                theme_controller::get("./quantum.theme.json", "secondary", value)
-            );
+        pub fn run_advanced(use_colors: bool) -> bool {
+                let mut system = sysinfo::System::new_all();
+                system.refresh_all();
+            
+                let cpu_vendor = cpu::cpu::get_cpu_vendor().unwrap();
+            
+                let cpu_info = match cpu_vendor.as_str() {
+                    "amd" => "AMD Ryzen",
+                    "intel" => "Intel",
+                    _ => "Unknown",
+                };
+            
+                let memory_message = get_memory_usage(&system);
+            
+                if use_colors {
+                    print("OS", &system.name().unwrap(), true);
+                    print("Os Version", &system.long_os_version().unwrap(), true);
+                    print("Host", &system.host_name().unwrap(), true);
+                    print("Kernel", &system.kernel_version().unwrap(), true);
+                    print("Uptime", &get_uptime(), true);
+                    print("CPU", &cpu_info, true);
+                    print("CPU Core Count", &system.physical_core_count().unwrap().to_string(), true);
+                    print("Theme", &theme_controller::new("./quantum.theme.json").unwrap()["name"].to_string(), true);
+                    print("Memory", &memory_message, true);
+                    print("Boot Time (as ms)", &system.boot_time().to_string(), true);
+                    print("Components", &system.components().len().to_string(), true);
+                    print("Disks", &system.disks().len().to_string(), true);
+                    print("Free Swap", &system.free_swap().to_string(), true);
+                    print("Cpu Info", &format!("{:#?}", system.global_cpu_info()), true);
+                    print("Networks", &format!("{:#?}", system.networks()), true);
+                } else {
+                    print("OS", &system.name().unwrap(), false);
+                    print("Os Version", &system.long_os_version().unwrap(), false);
+                    print("Host", &system.host_name().unwrap(), false);
+                    print("Kernel", &system.kernel_version().unwrap(), false);
+                    print("Uptime", &get_uptime(), false);
+                    print("CPU", &cpu_info, false);
+                    print("CPU Core Count", &system.physical_core_count().unwrap().to_string(), false);
+                    print("Theme", &theme_controller::new("./quantum.theme.json").unwrap()["name"].to_string(), false);
+                    print("Memory", &memory_message, false);
+                    print("Boot Time (as ms)", &system.boot_time().to_string(), false);
+                    print("Components", &system.components().len().to_string(), false);
+                    print("Disks", &system.disks().len().to_string(), false);
+                    print("Free Swap", &system.free_swap().to_string(), false);
+                    print("Cpu Info", &format!("{:#?}", system.global_cpu_info()), false);
+                    print("Networks", &format!("{:#?}", system.networks()), false);
+                }
+                return true;
+        }
 
-            println!("{}", message);
+        fn print(key: &str, value: &str, use_colors: bool) -> bool {
+            if use_colors {
+                let message = format!(
+                    "{}: {}",
+                    theme_controller::get("./quantum.theme.json", "primary", &("- ".to_owned() + key)),
+                    theme_controller::get("./quantum.theme.json", "secondary", value)
+                );
+    
+                println!("{}", message);
+    
+                return true;
+            } else {
+                let message = format!("{}: {}", &("- ".to_owned() + key), value);
+                println!("{}", message);
 
-            return true;
+                return true;
+            }
+
         }
 
         fn get_memory_usage(system: &System) -> String {

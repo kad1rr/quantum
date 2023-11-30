@@ -15,7 +15,7 @@ cargo run
 - The `sysinfo` and `serde_json` libraries are added to the project.
 
 ## Screenshots
-![Example](/example.png)
+![Example](/screenshot.png)
 
 # Currently, this package at beginning.
 So, a lot of things are missing.
